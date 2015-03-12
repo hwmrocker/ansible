@@ -32,6 +32,41 @@ The above would be the equivalent of::
     - name: add user testuser2
       user: name=testuser2 state=present groups=wheel
 
+You can also merge lists::
+
+    - name: add several users
+      user: name={{ item }} state=present groups=wheel
+      with_items:
+         - [testuser1, testuser2]
+         - [admin1, admin2]
+
+The above would be the equivalent of::
+
+    - name: add user testuser1
+      user: name=testuser1 state=present groups=wheel
+    - name: add user testuser2
+      user: name=testuser2 state=present groups=wheel
+    - name: add user admin1
+      user: name=testuser1 state=present groups=wheel
+    - name: add user admin2
+      user: name=testuser2 state=present groups=wheel
+
+If you need to loop over a list of lists, you need to wrap the lists like this::
+
+    - name: add several users
+      user: name={{ item[0] }} state={{ item[1] }} groups=wheel
+      with_items:
+         - [[testuser1, present]]
+         - [[testuser2, absent]]
+
+The above would be the equivalent of::
+
+    - name: add user testuser1
+      user: name=testuser1 state=present groups=wheel
+    - name: add user testuser2
+      user: name=testuser2 state=absent groups=wheel
+    - name: add user admin1
+
 The yum and apt modules use with_items to execute fewer package manager transactions.
 
 Note that the types of items you iterate over with 'with_items' do not have to be simple lists of strings.
